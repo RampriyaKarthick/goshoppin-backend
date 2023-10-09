@@ -7,14 +7,17 @@
     "start": "nodemon backend/server.js",
     "dev": "set NODE_ENV=development&&nodemon backend/server.js",
     "prod": "set NODE_ENV=production&&nodemon backend/server.js",
-    "seeder":"node backend/utils/seeder.js"
+    "seeder": "node backend/utils/seeder.js"
   },
   "author": "Rampriyakarthick",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
     "dotenv": "^16.1.4",
     "express": "^4.18.2",
-    "mongoose": "^7.2.2"
+    "mongoose": "^7.2.2",
+    "validator": "^13.11.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
