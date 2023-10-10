@@ -27,6 +27,9 @@ const productSchema = new mongoose.Schema({
             }
         }
     ],
+    user:{
+    type:mongoose.Schema.Types.ObjectId
+    },
     category:{
         type: String,
         required: [true, "Please enter product category"],
