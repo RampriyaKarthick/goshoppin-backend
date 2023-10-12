@@ -5,6 +5,7 @@ const ErrorHandler = require('../utils/errorHandler');
 const sendToken= require('../utils/jwt')
 const crypto = require('crypto')
 
+//register user 
 exports.registrerUser = catchAsyncError(async(req,res, next) =>{
 
     const{name, email, password, avatar} = req.body
@@ -20,7 +21,7 @@ sendToken(user,201,res)
     })
   
 
-
+// login user
 exports.loginUser = catchAsyncError(async (req, res, next)=> {
 const {email, password} = req.body
 if(!email || !password){
@@ -38,6 +39,7 @@ sendToken(user,201,res)
  
 })
 
+//logout user
 exports.logoutUser =(req, res, next) => {
     res.cookie('token', null, {
         expires:new Date(Date.now()),
@@ -49,6 +51,8 @@ exports.logoutUser =(req, res, next) => {
     })
 }
 
+
+//forgot password
 exports.forgotPassword = catchAsyncError(async(req, res, next) =>{
    const user = await User.findOne({email:req.body.email})
 
@@ -82,6 +86,7 @@ return next(new ErrorHandler(error.message), 500)
  }
 })
 
+//reset password
 exports.resetPassword = catchAsyncError( async (req, res, next) => {
     const resetPasswordToken =  crypto.createHash('sha256').update(req.params.token).digest('hex'); 
  
@@ -106,4 +111,43 @@ exports.resetPassword = catchAsyncError( async (req, res, next) => {
      await user.save({validateBeforeSave: false})
      sendToken(user, 201, res)
  
+ })
+
+ //get user profile
+ exports.getUserProfile = catchAsyncError(async(req,res,next) => {
+   const user = await User.findById(req.user.id)
+   res.status(200).json({
+success:true,
+user
+    })
+ })
+
+ //change password
+exports.changePassword  = catchAsyncError(async (req, res, next) => {
+    const user = await User.findById(req.user.id).select('+password');
+    //check old password
+    if(!await user.isValidPassword(req.body.oldPassword)) {
+        return next(new ErrorHandler('Old password is incorrect', 401));
+    }
+//assigning new password
+    user.password = req.body.password;
+    await user.save();
+    res.status(200).json({
+        success:true,
+    })
+ })
+
+ exports.updateProfile = catchAsyncError(async (req, res, next) => {
+    const newUserData ={
+        name : req.body.name,
+        email:req.body.email
+    }
+   const user =  await User.findByIdAndUpdate(req.user.id, newUserData, {
+        new:true,
+        runValidators:true,
+    })
+    res.status(200).json({
+        success:true,
+        user
+    })
  })
