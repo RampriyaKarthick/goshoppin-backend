@@ -9,9 +9,12 @@ exports.getProducts = async(req,res,next) => {
     const resPerPage = 3;
     const apiFeatures = new APIFeatures(Product.find(), req.query).search().filter().paginate(resPerPage);
     const products = await apiFeatures.query;
-res.status(200).json({
+const totalProductsCount = await Product.countDocuments({})
+    //await new Promise(resolve => setTimeout(resolve, 1000))
+  res.status(200).json({
     success:true,
-    count: products.length,
+    count: totalProductsCount,
+    resPerPage,
     products
 })
 }
@@ -29,7 +32,7 @@ exports.newProduct = catchAsyncError(async(req,res,next) =>{
 //Get Single product api/v1/product/:id
 exports.getSingleProduct = catchAsyncError(async(req, res, next) => {
     const product = await Product.findById(req.params.id).populate('reviews.user','name email');
-
+    //await new Promise(resolve => setTimeout(resolve, 1000))
     if(!product) {
         return next(new ErrorHandler('Product not found', 400));
     }
